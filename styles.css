@@ -185,8 +185,12 @@ html[data-theme="dark"] .theme-icon-sun {
 
 .tag {
   color: var(--primary);
-  font-weight: 700;
-  margin-bottom: 16px;
+  max-width: 760px;
+  margin: 0 auto 20px;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
 }
 
 html[data-theme="dark"] .tag {
@@ -269,9 +273,12 @@ html[data-theme="dark"] .tag {
 .section-title p {
   color: var(--primary);
   font-weight: 800;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  letter-spacing: 1.5px;
+  line-height: 1.35;
+  text-align: center;
+  margin-bottom: 12px;
 }
 
 .section-title h2 {
@@ -439,8 +446,12 @@ html[data-theme="dark"] .service-card .icon svg {
 .cta p {
   color: var(--accent);
   font-weight: 800;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  letter-spacing: 1.5px;
+  line-height: 1.35;
+  text-align: center;
+  margin: 0 auto 12px;
 }
 
 .cta h2 {
