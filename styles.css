@@ -9,9 +9,9 @@
   --card-text: #242434;
   --accent: #00d1ff;
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-  --page-bg: #f4f6fb;
+  --page-bg: #ffffff;
   --surface: #ffffff;
-  --surface-soft: #f7f8fe;
+  --surface-soft: #ffffff;
   --body-text: #242434;
   --body-muted: #55566a;
   --card-border: rgba(108, 44, 255, 0.08);
@@ -59,11 +59,16 @@ a {
 
 .header {
   min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--body-text);
+  padding: 150px 7% 24px;
+}
+
+html[data-theme="dark"] .header {
   background:
     linear-gradient(135deg, rgba(13, 13, 20, 0.96), rgba(75, 24, 180, 0.92)),
     radial-gradient(circle at top right, rgba(0, 209, 255, 0.4), transparent 30%);
   color: var(--text);
-  padding: 150px 7% 24px;
 }
 
 .navbar {
@@ -172,9 +177,13 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 .tag {
-  color: var(--accent);
+  color: var(--primary);
   font-weight: 700;
   margin-bottom: 16px;
+}
+
+html[data-theme="dark"] .tag {
+  color: var(--accent);
 }
 
 .hero h1 {
@@ -184,7 +193,7 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 .hero-text {
-  color: var(--muted);
+  color: var(--body-muted);
   max-width: 650px;
   font-size: 1.1rem;
   margin-bottom: 32px;
@@ -218,15 +227,15 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 .btn-secondary {
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(36, 36, 52, 0.3);
+  color: var(--body-text);
+  background: #fff;
 }
 
 .hero-card {
   width: 100%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #fff;
+  border: 1px solid var(--card-border);
   border-radius: 30px;
   padding: 20px;
   box-shadow: var(--shadow);
@@ -338,27 +347,26 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 .why {
-  background:
-    linear-gradient(135deg, rgba(13, 13, 20, 0.96), rgba(58, 22, 143, 0.92));
+  background: var(--page-bg);
 }
 
 .why .section-title h2,
 .why .why-item h3 {
-  color: var(--text);
+  color: var(--body-text);
 }
 
 .why .section-title p {
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .why-item {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #fff;
+  color: var(--body-text);
+  border: 1px solid var(--card-border);
 }
 
 .why-item p {
-  color: var(--muted);
+  color: var(--body-muted);
 }
 
 .gallery {
@@ -383,9 +391,9 @@ html[data-theme="dark"] .theme-icon-sun {
   margin: 60px 7%;
   padding: 46px;
   border-radius: 30px;
-  background:
-    linear-gradient(135deg, rgba(108, 44, 255, 0.96), rgba(13, 13, 20, 0.96));
-  color: var(--text);
+  background: #fff;
+  color: var(--body-text);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -407,12 +415,12 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 .cta span {
-  color: var(--muted);
+  color: var(--body-muted);
 }
 
 .footer {
-  background: var(--dark);
-  color: var(--muted);
+  background: #fff;
+  color: var(--body-muted);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -426,7 +434,7 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 .footer p:first-child {
-  color: var(--text);
+  color: var(--body-text);
   font-weight: 700;
 }
 
@@ -437,6 +445,58 @@ html[data-theme="dark"] .theme-icon-sun {
   object-fit: cover;
   border-radius: 18px;
   background: #fff;
+}
+
+html[data-theme="dark"] .hero-text {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .btn-secondary {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .hero-card,
+html[data-theme="dark"] .why-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+html[data-theme="dark"] .why {
+  background: linear-gradient(135deg, rgba(13, 13, 20, 0.96), rgba(58, 22, 143, 0.92));
+}
+
+html[data-theme="dark"] .why .section-title h2,
+html[data-theme="dark"] .why .why-item h3 {
+  color: var(--text);
+}
+
+html[data-theme="dark"] .why .section-title p {
+  color: var(--accent);
+}
+
+html[data-theme="dark"] .why-item p {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .cta {
+  background: linear-gradient(135deg, rgba(108, 44, 255, 0.96), rgba(13, 13, 20, 0.96));
+  color: var(--text);
+  border-color: transparent;
+}
+
+html[data-theme="dark"] .cta span,
+html[data-theme="dark"] .footer {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .footer {
+  background: var(--dark);
+}
+
+html[data-theme="dark"] .footer p:first-child {
+  color: var(--text);
 }
 
 @media (max-width: 1100px) {
