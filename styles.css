@@ -16,6 +16,8 @@
   --body-muted: #55566a;
   --card-border: rgba(108, 44, 255, 0.08);
   --card-shadow: 0 10px 30px rgba(20, 20, 40, 0.08);
+  --content-width: 1200px;
+  --page-gutter: 7%;
 }
 
 html[data-theme="dark"] {
@@ -61,7 +63,7 @@ a {
   min-height: 100vh;
   background: var(--page-bg);
   color: var(--body-text);
-  padding: 150px 7% 24px;
+  padding: 150px max(var(--page-gutter), calc((100% - var(--content-width)) / 2)) 24px;
 }
 
 html[data-theme="dark"] .header {
@@ -82,7 +84,7 @@ html[data-theme="dark"] .header {
   gap: 24px;
   width: 100%;
   min-height: 105px;
-  padding: 18px 7%;
+  padding: 18px max(var(--page-gutter), calc((100% - var(--content-width)) / 2));
   background: linear-gradient(100deg, rgba(13, 13, 20, 0.97), rgba(58, 22, 143, 0.97));
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(12px);
@@ -176,6 +178,10 @@ html[data-theme="dark"] .theme-icon-sun {
   gap: 50px;
 }
 
+.hero-content {
+  text-align: center;
+}
+
 .tag {
   color: var(--primary);
   font-weight: 700;
@@ -203,6 +209,7 @@ html[data-theme="dark"] .tag {
 .contact-buttons {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 14px;
 }
 
@@ -249,12 +256,13 @@ html[data-theme="dark"] .tag {
 }
 
 .section {
-  padding: 90px 7%;
+  padding: 90px max(var(--page-gutter), calc((100% - var(--content-width)) / 2));
 }
 
 .section-title {
   max-width: 760px;
-  margin-bottom: 38px;
+  margin: 0 auto 38px;
+  text-align: center;
 }
 
 .section-title p {
@@ -276,6 +284,7 @@ html[data-theme="dark"] .tag {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 36px;
   align-items: start;
+  text-align: center;
 }
 
 .intro-grid p {
@@ -328,6 +337,7 @@ html[data-theme="dark"] .tag {
   padding: 28px;
   box-shadow: var(--card-shadow);
   border: 1px solid var(--card-border);
+  text-align: center;
 }
 
 .service-card .icon {
@@ -388,7 +398,9 @@ html[data-theme="dark"] .tag {
 }
 
 .cta {
-  margin: 60px 7%;
+  width: calc(100% - (2 * max(var(--page-gutter), calc((100% - var(--content-width)) / 2))));
+  max-width: var(--content-width);
+  margin: 60px auto;
   padding: 46px;
   border-radius: 30px;
   background: #fff;
@@ -399,6 +411,7 @@ html[data-theme="dark"] .tag {
   justify-content: space-between;
   gap: 30px;
   box-shadow: var(--shadow);
+  text-align: center;
 }
 
 .cta p {
@@ -425,7 +438,7 @@ html[data-theme="dark"] .tag {
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  padding: 28px 7%;
+  padding: 28px max(var(--page-gutter), calc((100% - var(--content-width)) / 2));
 }
 
 .footer-content {
@@ -533,23 +546,37 @@ html[data-theme="dark"] .footer p:first-child {
   }
 
   .navbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand brand"
+      "links theme";
     align-items: center;
-    flex-wrap: wrap;
     gap: 14px;
     min-height: auto;
     padding-top: 14px;
     padding-bottom: 14px;
   }
 
+  .brand {
+    grid-area: brand;
+    justify-self: start;
+  }
+
   .nav-links {
+    grid-area: links;
     flex-wrap: wrap;
     gap: 14px;
+    justify-self: start;
   }
 
   .nav-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 18px;
+    display: contents;
+  }
+
+  .theme-toggle {
+    grid-area: theme;
+    justify-self: end;
   }
 
   .hero,
@@ -657,6 +684,7 @@ html[data-theme="dark"] .footer p:first-child {
 
   .cta {
     margin: 40px 22px;
+    width: calc(100% - 44px);
     padding: 30px 22px;
   }
 
