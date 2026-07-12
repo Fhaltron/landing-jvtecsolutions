@@ -60,10 +60,10 @@ a {
 }
 
 .header {
-  min-height: 100vh;
+  min-height: auto;
   background: var(--page-bg);
   color: var(--body-text);
-  padding: 150px max(var(--page-gutter), calc((100% - var(--content-width)) / 2)) 24px;
+  padding: 150px max(var(--page-gutter), calc((100% - var(--content-width)) / 2)) 80px;
 }
 
 html[data-theme="dark"] .header {
@@ -343,6 +343,21 @@ html[data-theme="dark"] .tag {
 .service-card .icon {
   font-size: 2.4rem;
   margin-bottom: 14px;
+}
+
+.service-card .icon svg {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html[data-theme="dark"] .service-card .icon svg {
+  stroke: var(--accent);
 }
 
 .service-card h3,
