@@ -1,0 +1,164 @@
+@import url("../styles.css");
+
+/*
+ * Lightfall pertenece exclusivamente a la portada. La navegación conserva su
+ * posición fija y las secciones que siguen mantienen sus fondos originales.
+ */
+.header {
+  min-height: auto;
+  padding: 0;
+  background: #100020;
+  overflow: visible;
+}
+
+/* Menú flotante: permanece visible mientras se recorre la página. */
+.navbar {
+  top: 18px;
+  left: 50%;
+  width: min(calc(100% - 36px), 1240px);
+  min-height: 82px;
+  padding: 12px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 24px;
+  background: rgba(15, 10, 34, 0.32);
+  box-shadow:
+    0 18px 48px rgba(4, 0, 20, 0.3),
+    0 0 0 1px rgba(12, 5, 30, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transform: translateX(-50%);
+  backdrop-filter: blur(20px) saturate(180%) contrast(105%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%) contrast(105%);
+}
+
+.navbar .brand-logo {
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+}
+
+html[data-theme="dark"] .header {
+  background: #100020;
+}
+
+.hero.lightfall-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: max(720px, 100svh);
+  padding: 150px max(var(--page-gutter), calc((100% - var(--content-width)) / 2)) 72px;
+  background: #100020;
+  color: var(--text);
+}
+
+.hero.lightfall-hero > .lightfall-container {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+}
+
+.hero.lightfall-hero > .lightfall-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Suaviza el efecto para que el texto y la portada sigan siendo protagonistas. */
+.hero.lightfall-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(10, 2, 29, 0.64), rgba(31, 9, 73, 0.34) 54%, rgba(12, 2, 31, 0.5)),
+    linear-gradient(180deg, rgba(11, 3, 28, 0.08), rgba(12, 3, 31, 0.3));
+  pointer-events: none;
+}
+
+.hero.lightfall-hero .tag {
+  color: var(--accent);
+}
+
+.hero.lightfall-hero h1 {
+  color: #fff;
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hero.lightfall-hero .hero-text {
+  color: rgba(245, 245, 247, 0.86);
+}
+
+.hero.lightfall-hero .btn-secondary {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.hero.lightfall-hero .hero-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1100px) {
+  .hero.lightfall-hero {
+    padding-right: 5%;
+    padding-left: 5%;
+  }
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding-top: 0;
+  }
+
+  .navbar {
+    top: 12px;
+    width: calc(100% - 24px);
+    padding: 12px 20px;
+    border-radius: 22px;
+  }
+
+  .hero.lightfall-hero {
+    min-height: auto;
+    padding-top: 180px;
+    padding-bottom: 70px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding-top: 0;
+  }
+
+  .navbar {
+    top: 10px;
+    width: calc(100% - 20px);
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .hero.lightfall-hero {
+    padding: 176px 22px 54px;
+  }
+}
+
+@media (max-width: 420px) {
+  .header {
+    padding-top: 0;
+  }
+
+  .hero.lightfall-hero {
+    padding-top: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero.lightfall-hero > .lightfall-container {
+    pointer-events: none;
+  }
+}
