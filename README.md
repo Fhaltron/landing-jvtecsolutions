@@ -1,16 +1,52 @@
-# React + Vite
+# JV TecSolutions
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Landing page de JV TecSolutions construida con React y Vite. Incluye tema claro/oscuro, navegación flotante con contraste dinámico y una portada WebGL con el efecto Lightfall.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20 o superior.
+- npm 10 o superior.
 
-## React Compiler
+## Desarrollo local
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the Oxlint configuration
+Vite mostrará en la terminal la URL local, normalmente `http://localhost:5173`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Validación
+
+```bash
+npm run check
+```
+
+Este comando ejecuta el linter y genera la compilación de producción. También pueden ejecutarse por separado:
+
+```bash
+npm run lint
+npm run build
+```
+
+## Estructura relevante
+
+- `src/App.jsx`: contenido, tema y comportamiento de navegación.
+- `src/App.css` y `styles.css`: estilos específicos y generales.
+- `src/Lightfall.jsx`: renderizado y ciclo de vida de la animación WebGL.
+- `assets/`: logo y portada importados por Vite.
+- `vercel.json`: cabeceras HTTP de seguridad para producción.
+- `INFORME_SEGURIDAD_OPTIMIZACION.md`: auditoría y decisiones de seguridad.
+
+## Despliegue
+
+Vercel ejecuta `npm run build` y publica `dist/`. Los cambios enviados a la rama de producción configurada en Vercel generan un nuevo despliegue automáticamente.
+
+Antes de publicar:
+
+```bash
+npm run check
+git status
+```
+
+No deben versionarse `node_modules/`, `dist/`, archivos `.local` ni credenciales.

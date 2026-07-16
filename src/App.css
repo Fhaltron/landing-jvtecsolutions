@@ -1,5 +1,23 @@
 @import url("../styles.css");
 
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 2000;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #fff;
+  color: #090914;
+  font-weight: 700;
+  transform: translateY(-160%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /*
  * Lightfall pertenece exclusivamente a la portada. La navegación conserva su
  * posición fija y las secciones que siguen mantienen sus fondos originales.

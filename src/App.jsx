@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lightfall from "./Lightfall";
 import logo from "../assets/logo.png";
 import portada from "../assets/portada.png";
 import "./App.css";
+
+const LIGHTFALL_COLORS = Object.freeze(["#A6C8FF", "#5227FF", "#FF9FFC"]);
+
+const hideUnavailableImage = event => {
+  event.currentTarget.hidden = true;
+};
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -13,6 +19,7 @@ function App() {
     }
   });
   const [useDarkNavText, setUseDarkNavText] = useState(false);
+  const navbarRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = isDark ? "dark" : "light";
@@ -28,7 +35,7 @@ function App() {
     let animationFrame;
 
     const updateNavContrast = () => {
-      const navbar = document.querySelector(".navbar");
+      const navbar = navbarRef.current;
       if (!navbar) return;
 
       const navbarRect = navbar.getBoundingClientRect();
@@ -45,7 +52,9 @@ function App() {
       const tone = region?.dataset.navTone;
       const hasLightBackground = tone === "light" || (tone === "theme" && !isDark);
 
-      setUseDarkNavText(hasLightBackground);
+      setUseDarkNavText(currentValue =>
+        currentValue === hasLightBackground ? currentValue : hasLightBackground,
+      );
     };
 
     const scheduleContrastUpdate = () => {
@@ -66,8 +75,16 @@ function App() {
 
   return (
     <>
+      <a className="skip-link" href="#contenido-principal">
+        Saltar al contenido principal
+      </a>
+
       <header className="header" data-nav-tone="dark">
-        <nav className={`navbar ${useDarkNavText ? "navbar--dark-text" : "navbar--light-text"}`}>
+        <nav
+          ref={navbarRef}
+          className={`navbar ${useDarkNavText ? "navbar--dark-text" : "navbar--light-text"}`}
+          aria-label="Navegación principal"
+        >
           <div className="brand">
             <img
               src={logo}
@@ -75,6 +92,7 @@ function App() {
               className="brand-logo"
               width="912"
               height="900"
+              decoding="async"
             />
 
             <div>
@@ -111,7 +129,7 @@ function App() {
 
         <section className="hero lightfall-hero" data-nav-tone="dark">
           <Lightfall
-            colors={["#A6C8FF", "#5227FF", "#FF9FFC"]}
+            colors={LIGHTFALL_COLORS}
             backgroundColor="#0A29FF"
             speed={0.5}
             streakCount={2}
@@ -126,9 +144,6 @@ function App() {
             mouseInteraction
             mouseStrength={0.5}
             mouseRadius={1}
-            color1="#A6C8FF"
-            color2="#5227FF"
-            color3="#FF9FFC"
           />
 
           <div className="hero-content">
@@ -163,12 +178,14 @@ function App() {
               alt="Portada de JV TecSolutions"
               width="1080"
               height="608"
+              decoding="async"
+              fetchPriority="high"
             />
           </div>
         </section>
       </header>
 
-      <main>
+      <main id="contenido-principal">
         <section className="section intro" id="nosotros" data-nav-tone="theme">
           <div className="section-title">
             <p>Sobre nosotros</p>
@@ -310,21 +327,33 @@ function App() {
             <img
               src="/assets/servicios-computo.jpg"
               alt="Servicio de reparación de computadoras"
+              loading="lazy"
+              decoding="async"
+              onError={hideUnavailableImage}
             />
 
             <img
               src="/assets/servicios-web.jpg"
               alt="Servicio de páginas web"
+              loading="lazy"
+              decoding="async"
+              onError={hideUnavailableImage}
             />
 
             <img
               src="/assets/servicios-camaras.jpg"
               alt="Servicio de cámaras de seguridad"
+              loading="lazy"
+              decoding="async"
+              onError={hideUnavailableImage}
             />
 
             <img
               src="/assets/servicios-redes.jpg"
               alt="Servicio de redes e internet"
+              loading="lazy"
+              decoding="async"
+              onError={hideUnavailableImage}
             />
           </div>
         </section>
@@ -379,6 +408,8 @@ function App() {
           className="footer-logo"
           width="912"
           height="900"
+          loading="lazy"
+          decoding="async"
         />
       </footer>
     </>

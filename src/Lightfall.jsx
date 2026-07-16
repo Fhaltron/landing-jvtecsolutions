@@ -3,9 +3,12 @@ import { Renderer, Program, Mesh, Triangle } from 'ogl';
 import './Lightfall.css';
 
 const MAX_COLORS = 8;
+const MAX_DEVICE_PIXEL_RATIO = 2;
+const HEX_COLOR_PATTERN = /^#?[\da-f]{6}$/i;
 
 const hexToRGB = hex => {
-  const c = hex.replace('#', '').padEnd(6, '0');
+  const safeHex = typeof hex === 'string' && HEX_COLOR_PATTERN.test(hex) ? hex : '#000000';
+  const c = safeHex.replace('#', '');
   const r = parseInt(c.slice(0, 2), 16) / 255;
   const g = parseInt(c.slice(2, 4), 16) / 255;
   const b = parseInt(c.slice(4, 6), 16) / 255;
@@ -185,8 +188,7 @@ const Lightfall = ({
   mouseInteraction = true,
   mouseStrength = 0.5,
   mouseRadius = 1,
-  mouseDampening = 0.15,
-  mixBlendMode
+  mouseDampening = 0.15
 }) => {
   const containerRef = useRef(null);
   const rafRef = useRef(null);
@@ -201,18 +203,31 @@ const Lightfall = ({
     const container = containerRef.current;
     if (!container) return;
 
-    const renderer = new Renderer({
-      dpr: dpr ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1),
-      alpha: true,
-      antialias: true
-    });
+    const devicePixelRatio = dpr ?? window.devicePixelRatio ?? 1;
+    const safeDpr = Math.min(
+      MAX_DEVICE_PIXEL_RATIO,
+      Math.max(1, Number.isFinite(devicePixelRatio) ? devicePixelRatio : 1)
+    );
+
+    let renderer;
+    try {
+      renderer = new Renderer({
+        dpr: safeDpr,
+        alpha: true,
+        antialias: false
+      });
+    } catch (error) {
+      container.dataset.renderFallback = 'true';
+      console.error('No fue posible iniciar la animación Lightfall.', error);
+      return;
+    }
+
     rendererRef.current = renderer;
     const gl = renderer.gl;
     const canvas = gl.canvas;
 
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.display = 'block';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.setAttribute('role', 'presentation');
     container.appendChild(canvas);
 
     const { arr, count, avg } = prepColors(colors);
@@ -257,13 +272,14 @@ const Lightfall = ({
 
     const resize = () => {
       const rect = container.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
       renderer.setSize(rect.width, rect.height);
       uniforms.iResolution.value = [gl.drawingBufferWidth, gl.drawingBufferHeight, 1];
     };
 
     resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(container);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
 
     const onPointerMove = e => {
       const rect = canvas.getBoundingClientRect();
@@ -279,8 +295,19 @@ const Lightfall = ({
       canvas.addEventListener('pointermove', onPointerMove);
     }
 
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let isIntersecting = true;
+    let isDocumentVisible = !document.hidden;
+    let reduceMotion = motionPreference.matches;
+    let renderFailed = false;
+
+    const canAnimate = () =>
+      !paused && isIntersecting && isDocumentVisible && !reduceMotion && !renderFailed;
+
     const loop = t => {
-      rafRef.current = requestAnimationFrame(loop);
+      rafRef.current = null;
+      if (!canAnimate()) return;
+
       uniforms.iTime.value = t * 0.001;
       if (mouseDampening > 0) {
         if (!lastTimeRef.current) lastTimeRef.current = t;
@@ -296,20 +323,67 @@ const Lightfall = ({
       } else {
         lastTimeRef.current = t;
       }
-      if (!paused && programRef.current && meshRef.current) {
+      if (programRef.current && meshRef.current) {
         try {
           renderer.render({ scene: meshRef.current });
-        } catch (e) {
-          console.error(e);
+        } catch (error) {
+          renderFailed = true;
+          console.error('La animación Lightfall se detuvo por un error de renderizado.', error);
+          return;
         }
       }
+
+      rafRef.current = requestAnimationFrame(loop);
     };
-    rafRef.current = requestAnimationFrame(loop);
+
+    const syncAnimation = () => {
+      if (canAnimate() && rafRef.current === null) {
+        lastTimeRef.current = 0;
+        rafRef.current = requestAnimationFrame(loop);
+      } else if (!canAnimate() && rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+
+    const intersectionObserver = new IntersectionObserver(
+      entries => {
+        isIntersecting = entries[0]?.isIntersecting ?? true;
+        syncAnimation();
+      },
+      { threshold: 0.01 }
+    );
+    intersectionObserver.observe(container);
+
+    const onVisibilityChange = () => {
+      isDocumentVisible = !document.hidden;
+      syncAnimation();
+    };
+
+    const onMotionPreferenceChange = event => {
+      reduceMotion = event.matches;
+      syncAnimation();
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    motionPreference.addEventListener('change', onMotionPreferenceChange);
+
+    try {
+      renderer.render({ scene: mesh });
+    } catch (error) {
+      renderFailed = true;
+      console.error('No fue posible dibujar Lightfall.', error);
+    }
+    syncAnimation();
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
       if (mouseInteraction) canvas.removeEventListener('pointermove', onPointerMove);
-      ro.disconnect();
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      motionPreference.removeEventListener('change', onMotionPreferenceChange);
       if (canvas.parentElement === container) {
         container.removeChild(canvas);
       }
@@ -352,9 +426,6 @@ const Lightfall = ({
     <div
       ref={containerRef}
       className={`lightfall-container ${className ?? ''}`}
-      style={{
-        ...(mixBlendMode && { mixBlendMode })
-      }}
     />
   );
 };
