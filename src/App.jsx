@@ -12,6 +12,7 @@ function App() {
       return false;
     }
   });
+  const [useDarkNavText, setUseDarkNavText] = useState(false);
 
   useEffect(() => {
     document.documentElement.dataset.theme = isDark ? "dark" : "light";
@@ -23,10 +24,50 @@ function App() {
     }
   }, [isDark]);
 
+  useEffect(() => {
+    let animationFrame;
+
+    const updateNavContrast = () => {
+      const navbar = document.querySelector(".navbar");
+      if (!navbar) return;
+
+      const navbarRect = navbar.getBoundingClientRect();
+      const sampleX = window.innerWidth / 2;
+      const sampleY = Math.min(
+        window.innerHeight - 1,
+        navbarRect.top + navbarRect.height / 2,
+      );
+
+      const backgroundElement = document
+        .elementsFromPoint(sampleX, sampleY)
+        .find(element => !navbar.contains(element));
+      const region = backgroundElement?.closest("[data-nav-tone]");
+      const tone = region?.dataset.navTone;
+      const hasLightBackground = tone === "light" || (tone === "theme" && !isDark);
+
+      setUseDarkNavText(hasLightBackground);
+    };
+
+    const scheduleContrastUpdate = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(updateNavContrast);
+    };
+
+    updateNavContrast();
+    window.addEventListener("scroll", scheduleContrastUpdate, { passive: true });
+    window.addEventListener("resize", scheduleContrastUpdate);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", scheduleContrastUpdate);
+      window.removeEventListener("resize", scheduleContrastUpdate);
+    };
+  }, [isDark]);
+
   return (
     <>
-      <header className="header">
-        <nav className="navbar">
+      <header className="header" data-nav-tone="dark">
+        <nav className={`navbar ${useDarkNavText ? "navbar--dark-text" : "navbar--light-text"}`}>
           <div className="brand">
             <img
               src={logo}
@@ -68,7 +109,7 @@ function App() {
           </div>
         </nav>
 
-        <section className="hero lightfall-hero">
+        <section className="hero lightfall-hero" data-nav-tone="dark">
           <Lightfall
             colors={["#A6C8FF", "#5227FF", "#FF9FFC"]}
             backgroundColor="#0A29FF"
@@ -128,7 +169,7 @@ function App() {
       </header>
 
       <main>
-        <section className="section intro" id="nosotros">
+        <section className="section intro" id="nosotros" data-nav-tone="theme">
           <div className="section-title">
             <p>Sobre nosotros</p>
             <h2>Tecnología simple, funcional y a tu medida</h2>
@@ -166,7 +207,7 @@ function App() {
           </div>
         </section>
 
-        <section className="section services" id="servicios">
+        <section className="section services" id="servicios" data-nav-tone="theme">
           <div className="section-title">
             <p>Servicios</p>
             <h2>¿En qué podemos ayudarte?</h2>
@@ -229,7 +270,7 @@ function App() {
           </div>
         </section>
 
-        <section className="section why">
+        <section className="section why" data-nav-tone="theme">
           <div className="section-title">
             <p>Por qué elegirnos</p>
             <h2>Atención clara, cercana y enfocada en soluciones</h2>
@@ -259,7 +300,7 @@ function App() {
           </div>
         </section>
 
-        <section className="section gallery" id="galeria">
+        <section className="section gallery" id="galeria" data-nav-tone="theme">
           <div className="section-title">
             <p>Galería</p>
             <h2>Servicios que ofrecemos</h2>
@@ -288,7 +329,7 @@ function App() {
           </div>
         </section>
 
-        <section className="cta" id="contacto">
+        <section className="cta" id="contacto" data-nav-tone="dark">
           <div className="cta-inner">
             <div>
               <p>¿Necesitas una solución tecnológica?</p>
@@ -325,7 +366,7 @@ function App() {
         </section>
       </main>
 
-      <footer className="footer">
+      <footer className="footer" data-nav-tone="theme">
         <div className="footer-content">
           <p>© 2026 JV TecSolutions. Soluciones en tecnología.</p>
           <p>WhatsApp: 33 33 01 80 23 | jvtecsolutions@gmail.com</p>
