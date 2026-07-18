@@ -3,7 +3,10 @@ import { Renderer, Program, Mesh, Triangle } from 'ogl';
 import './Lightfall.css';
 
 const MAX_COLORS = 8;
-const MAX_DEVICE_PIXEL_RATIO = 2;
+const MAX_DEVICE_PIXEL_RATIO = 1.5;
+const MAX_MOBILE_DEVICE_PIXEL_RATIO = 1;
+const DESKTOP_TARGET_FPS = 30;
+const MOBILE_TARGET_FPS = 24;
 const HEX_COLOR_PATTERN = /^#?[\da-f]{6}$/i;
 
 const hexToRGB = hex => {
@@ -101,7 +104,7 @@ vec2 sceneC(vec2 frag, vec2 r) {
   float z = 0.0;
   float d = 1e3;
   vec4 O = vec4(0.0);
-  for (int k = 0; k < 39; k++) {
+  for (int k = 0; k < 28; k++) {
     if (d <= 1e-4) break;
     O = z * normalize(vec4(P, uZoom, 0.0)) - vec4(0.0, 4.0, 1.0, 0.0) / 4.5;
     d = 1.0 - sqrt(length(O * O));
@@ -198,14 +201,19 @@ const Lightfall = ({
   const rendererRef = useRef(null);
   const mouseTargetRef = useRef([0, 0]);
   const lastTimeRef = useRef(0);
+  const lastFrameRef = useRef(0);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const effectiveMouseInteraction = mouseInteraction && !coarsePointer;
+    const maxDpr = coarsePointer ? MAX_MOBILE_DEVICE_PIXEL_RATIO : MAX_DEVICE_PIXEL_RATIO;
+    const targetFrameTime = 1000 / (coarsePointer ? MOBILE_TARGET_FPS : DESKTOP_TARGET_FPS);
     const devicePixelRatio = dpr ?? window.devicePixelRatio ?? 1;
     const safeDpr = Math.min(
-      MAX_DEVICE_PIXEL_RATIO,
+      maxDpr,
       Math.max(1, Number.isFinite(devicePixelRatio) ? devicePixelRatio : 1)
     );
 
@@ -257,7 +265,7 @@ const Lightfall = ({
       uZoom: { value: zoom },
       uBgGlow: { value: backgroundGlow },
       uOpacity: { value: opacity },
-      uMouseEnabled: { value: mouseInteraction ? 1 : 0 },
+      uMouseEnabled: { value: effectiveMouseInteraction ? 1 : 0 },
       uMouseStrength: { value: mouseStrength },
       uMouseRadius: { value: mouseRadius }
     };
@@ -291,7 +299,7 @@ const Lightfall = ({
         uniforms.iMouse.value = [x, y];
       }
     };
-    if (mouseInteraction) {
+    if (effectiveMouseInteraction) {
       canvas.addEventListener('pointermove', onPointerMove);
     }
 
@@ -300,13 +308,26 @@ const Lightfall = ({
     let isDocumentVisible = !document.hidden;
     let reduceMotion = motionPreference.matches;
     let renderFailed = false;
+    const saveDataEnabled = navigator.connection?.saveData === true;
 
     const canAnimate = () =>
-      !paused && isIntersecting && isDocumentVisible && !reduceMotion && !renderFailed;
+      !paused &&
+      isIntersecting &&
+      isDocumentVisible &&
+      !reduceMotion &&
+      !saveDataEnabled &&
+      !renderFailed;
 
     const loop = t => {
       rafRef.current = null;
       if (!canAnimate()) return;
+
+      const elapsedSinceRender = t - lastFrameRef.current;
+      if (lastFrameRef.current && elapsedSinceRender < targetFrameTime) {
+        rafRef.current = requestAnimationFrame(loop);
+        return;
+      }
+      lastFrameRef.current = t - (elapsedSinceRender % targetFrameTime);
 
       uniforms.iTime.value = t * 0.001;
       if (mouseDampening > 0) {
@@ -339,6 +360,7 @@ const Lightfall = ({
     const syncAnimation = () => {
       if (canAnimate() && rafRef.current === null) {
         lastTimeRef.current = 0;
+        lastFrameRef.current = 0;
         rafRef.current = requestAnimationFrame(loop);
       } else if (!canAnimate() && rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
@@ -379,7 +401,7 @@ const Lightfall = ({
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
-      if (mouseInteraction) canvas.removeEventListener('pointermove', onPointerMove);
+      if (effectiveMouseInteraction) canvas.removeEventListener('pointermove', onPointerMove);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);

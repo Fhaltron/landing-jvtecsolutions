@@ -32,7 +32,7 @@ function App() {
   }, [isDark]);
 
   useEffect(() => {
-    let animationFrame;
+    let contrastTimer;
 
     const updateNavContrast = () => {
       const navbar = navbarRef.current;
@@ -58,8 +58,11 @@ function App() {
     };
 
     const scheduleContrastUpdate = () => {
-      cancelAnimationFrame(animationFrame);
-      animationFrame = requestAnimationFrame(updateNavContrast);
+      if (contrastTimer) return;
+      contrastTimer = window.setTimeout(() => {
+        contrastTimer = undefined;
+        updateNavContrast();
+      }, 80);
     };
 
     updateNavContrast();
@@ -67,7 +70,7 @@ function App() {
     window.addEventListener("resize", scheduleContrastUpdate);
 
     return () => {
-      cancelAnimationFrame(animationFrame);
+      window.clearTimeout(contrastTimer);
       window.removeEventListener("scroll", scheduleContrastUpdate);
       window.removeEventListener("resize", scheduleContrastUpdate);
     };
@@ -79,21 +82,23 @@ function App() {
         Saltar al contenido principal
       </a>
 
-      <header className="header" data-nav-tone="dark">
+      <header className="header" id="inicio" data-nav-tone="dark">
         <nav
           ref={navbarRef}
           className={`navbar ${useDarkNavText ? "navbar--dark-text" : "navbar--light-text"}`}
           aria-label="Navegación principal"
         >
           <div className="brand">
-            <img
-              src={logo}
-              alt="Logo JV TecSolutions"
-              className="brand-logo"
-              width="912"
-              height="900"
-              decoding="async"
-            />
+            <a className="brand-logo-link" href="#inicio" aria-label="Volver al inicio">
+              <img
+                src={logo}
+                alt="Logo JV TecSolutions"
+                className="brand-logo"
+                width="912"
+                height="900"
+                decoding="async"
+              />
+            </a>
 
             <div>
               <strong>JV TecSolutions</strong>
@@ -397,9 +402,52 @@ function App() {
 
       <footer className="footer" data-nav-tone="theme">
         <div className="footer-content">
-          <p>© 2026 JV TecSolutions. Soluciones en tecnología.</p>
-          <p>WhatsApp: 33 33 01 80 23 | jvtecsolutions@gmail.com</p>
-          <p>Todos los derechos reservados</p>
+          <nav className="social-links" aria-label="Redes sociales y contacto">
+            <a
+              href="https://www.facebook.com/JVTecSolutions"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visitar Facebook de JV TecSolutions"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 8h3V4h-3c-3.3 0-5 2-5 5v2H6v4h3v7h4v-7h3.2l.8-4h-4V9c0-.7.3-1 1-1Z" />
+              </svg>
+            </a>
+
+            <a
+              href="https://wa.me/523333018023"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Contactar por WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 11.7A8 8 0 0 1 8.1 18.6L4 20l1.4-4A8 8 0 1 1 20 11.7Z" />
+                <path d="M9 8.2c.3-.5.6-.5.9-.5h.4l.8 2c.1.3 0 .5-.2.7l-.6.7c.8 1.6 1.9 2.7 3.5 3.5l.7-.8c.2-.2.4-.3.7-.2l1.9.9c.3.1.4.4.4.7-.2 1.3-1.2 2-2.5 2-3.8 0-8-4-8-7.8 0-.5.2-.9.5-1.2.4-.4 1-.4 1.5 0Z" />
+              </svg>
+            </a>
+
+            <a
+              href="https://www.instagram.com/jv_tecsolutions/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visitar Instagram de JV TecSolutions"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle className="social-icon-dot" cx="17.5" cy="6.5" r="1" />
+              </svg>
+            </a>
+
+            <a href="mailto:jvtecsolutions@gmail.com" aria-label="Enviar correo a JV TecSolutions">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m4 7 8 6 8-6" />
+              </svg>
+            </a>
+          </nav>
+
+          <p>© 2026 JV TecSolutions - Soluciones en Tecnología. Todos los derechos reservados.</p>
         </div>
 
         <img

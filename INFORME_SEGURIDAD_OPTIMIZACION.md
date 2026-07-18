@@ -1,6 +1,6 @@
 # Informe de seguridad y optimización
 
-Fecha de revisión: 15 de julio de 2026
+Última revisión: 18 de julio de 2026
 
 ## Resumen ejecutivo
 
@@ -16,8 +16,8 @@ Se aplicaron medidas de defensa en profundidad, correcciones de robustez y optim
 | --- | ---: | ---: |
 | Crítico | 0 | 0 |
 | Alto | 0 | 0 |
-| Medio | 0 | 2 |
-| Bajo | 2 | 5 |
+| Medio | 0 | 3 |
+| Bajo | 2 | 6 |
 
 Los dos pendientes bajos se describen al final del informe y no representan una puerta de acceso al sitio.
 
@@ -44,11 +44,15 @@ La CSP limita scripts, estilos, imágenes, fuentes y conexiones al mismo origen;
 - **Nivel original:** medio para disponibilidad y experiencia del cliente.
 - **Riesgo:** usar sin límite el `devicePixelRatio` podía multiplicar el número de píxeles renderizados en pantallas de alta densidad. Además, la animación seguía activa aunque estuviera fuera de pantalla o la pestaña estuviera oculta.
 - **Corrección:**
-  - DPR limitado a un máximo de `2`.
+  - DPR limitado a `1.5` en escritorio y `1` en dispositivos con puntero táctil.
+  - Frecuencia limitada a un máximo de 30 FPS en escritorio y 24 FPS en móvil.
+  - Iteraciones principales del shader reducidas de 39 a 28, conservando el aspecto visual.
   - Antialias desactivado para el shader de pantalla completa.
   - Animación pausada mediante `IntersectionObserver` cuando sale del viewport.
   - Animación pausada cuando el documento queda oculto.
   - Respeto real de `prefers-reduced-motion`.
+  - Animación estática cuando el navegador indica ahorro de datos mediante `saveData`.
+  - Interacción con el cursor desactivada automáticamente en dispositivos táctiles.
   - Render estático inicial cuando la animación no debe continuar.
   - Detención controlada si WebGL falla durante el renderizado.
 
@@ -83,6 +87,16 @@ La CSP limita scripts, estilos, imágenes, fuentes y conexiones al mismo origen;
 - El acceso a `localStorage` está dentro de bloques `try/catch`; si el navegador lo bloquea, solo se pierde la persistencia del tema y la página continúa funcionando.
 - El valor recuperado de almacenamiento se compara únicamente contra la cadena `dark` y no se inserta como HTML.
 
+### 8. Aislamiento de recursos y permisos del navegador
+
+- **Nivel original:** bajo, como defensa en profundidad.
+- **Riesgo:** la política anterior no declaraba explícitamente el tratamiento de recursos secundarios, multimedia, manifiestos y workers, y dejaba disponibles funciones del navegador que la landing no utiliza.
+- **Corrección:**
+  - Se añadió `Cross-Origin-Resource-Policy: same-origin`.
+  - La CSP bloquea explícitamente `child-src`, `frame-src` y `media-src`, y restringe manifiestos y workers al mismo origen.
+  - `Permissions-Policy` desactiva acelerómetro, reproducción automática, temas de publicidad, captura de pantalla, contenido cifrado, giroscopio, magnetómetro, picture-in-picture y credenciales públicas, además de las capacidades ya bloqueadas.
+  - Se agregó una política de referencia también en el HTML como respaldo para despliegues que no utilicen Vercel.
+
 ## Optimizaciones aplicadas
 
 ### Rendimiento
@@ -90,8 +104,12 @@ La CSP limita scripts, estilos, imágenes, fuentes y conexiones al mismo origen;
 - La portada declara dimensiones, `fetchPriority="high"` y decodificación asíncrona.
 - Las imágenes no prioritarias usan `loading="lazy"` y `decoding="async"`.
 - El canvas decorativo está oculto para tecnologías de asistencia.
-- Los cambios de contraste del menú se agrupan con `requestAnimationFrame`.
+- El cálculo de contraste del menú se limita a una ejecución cada 80 ms durante el desplazamiento, en lugar de leer el layout en cada cuadro.
 - El estado del menú solo se modifica cuando cambia realmente el contraste necesario.
+- El desenfoque del menú flotante se redujo de 20 px a 12 px y se sustituyó por un fondo ligeramente más opaco para conservar el diseño.
+- En tablet y móvil se desactiva el `backdrop-filter` de la navegación, evitando una recomposición costosa durante el scroll.
+- Los desenfoques de la tarjeta y botón secundarios de la portada se redujeron de 8 px a 4 px.
+- Las animaciones hover siguen usando `transform` y se limitan a dispositivos con cursor preciso, evitando trabajo adicional en pantallas táctiles.
 - El observador de tamaño ignora dimensiones iguales o menores que cero.
 - Se añadió `npm run check` para ejecutar linter y compilación antes de publicar.
 
@@ -126,10 +144,14 @@ Herramientas de desarrollo revisadas:
 - Plugin React para Vite 6.0.3
 - Oxlint 1.71.0
 
-Resultados del 15 de julio de 2026:
+Resultados anteriores del 15 de julio de 2026:
 
 - `npm audit --omit=dev`: **0 vulnerabilidades**.
 - `npm audit`: **0 vulnerabilidades** incluyendo herramientas de desarrollo.
+
+Comprobación repetida el 18 de julio de 2026:
+
+- `npm audit --omit=dev --audit-level=moderate`: **0 vulnerabilidades** en dependencias de producción.
 
 Una auditoría de dependencias solo refleja avisos conocidos en el momento de ejecutarla. Debe repetirse antes de publicaciones importantes y después de actualizar paquetes.
 
@@ -159,11 +181,14 @@ El repositorio conserva `script.js`, copias `src/App.backup.*`, recursos de plan
 - `npm run check`: linter y compilación completados correctamente.
 - `npm audit --omit=dev`: 0 vulnerabilidades.
 - `npm audit`: 0 vulnerabilidades.
+- Nueva auditoría de producción del 18 de julio: 0 vulnerabilidades.
 - Búsqueda de `dangerouslySetInnerHTML`, `innerHTML`, `eval`, `new Function`, `document.write`, scripts inline y enlaces externos sin aislamiento.
 - Revisión de montaje y limpieza de eventos, observadores, WebGL y cuadros de animación.
 - Validación visual local de la portada y navegación.
 - Revisión de recursos generados por Vite y rutas de imágenes.
 - Validación de la configuración JSON de Vercel y de espacios/conflictos en los cambios.
+- Verificación de que todos los enlaces con `target="_blank"` conservan `rel="noopener noreferrer"`.
+- Compilación de producción posterior a la reducción de FPS, DPR, iteraciones del shader y filtros visuales.
 - Sintaxis de `headers` cotejada con la [documentación oficial de `vercel.json`](https://vercel.com/docs/project-configuration/vercel-json).
 
 ## Recomendaciones operativas
