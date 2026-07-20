@@ -9,9 +9,11 @@
   --card-text: #242434;
   --accent: #00d1ff;
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-  --page-bg: #ffffff;
-  --surface: #ffffff;
-  --surface-soft: #ffffff;
+  --pearl: #f7f5ef;
+  --pearl-soft: #fbfaf6;
+  --page-bg: var(--pearl);
+  --surface: var(--pearl);
+  --surface-soft: var(--pearl-soft);
   --body-text: #242434;
   --body-muted: #55566a;
   --card-border: rgba(108, 44, 255, 0.08);
@@ -302,16 +304,17 @@ html[data-theme="dark"] .tag {
 }
 
 .stats-card {
-  background: var(--dark);
-  color: var(--text);
+  background: var(--page-bg);
+  color: var(--body-text);
+  border: 1px solid rgba(108, 44, 255, 0.18);
   border-radius: 24px;
   padding: 28px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 10px 26px rgba(45, 35, 70, 0.08);
 }
 
 .stats-card div {
   padding: 18px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(108, 44, 255, 0.12);
 }
 
 .stats-card div:last-child {
@@ -320,12 +323,12 @@ html[data-theme="dark"] .tag {
 
 .stats-card strong {
   display: block;
-  color: var(--accent);
+  color: var(--primary);
   font-size: 1.2rem;
 }
 
 .stats-card span {
-  color: var(--muted);
+  color: var(--body-muted);
 }
 
 .services {
@@ -429,8 +432,10 @@ html[data-theme="dark"] .service-card .icon svg {
   width: 100%;
   margin: 0;
   padding: 72px max(var(--page-gutter), calc((100% - var(--content-width)) / 2));
-  background: linear-gradient(135deg, rgba(108, 44, 255, 0.96), rgba(13, 13, 20, 0.96));
-  color: var(--text);
+  background: var(--page-bg);
+  color: var(--body-text);
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
   text-align: center;
 }
 
@@ -445,7 +450,7 @@ html[data-theme="dark"] .service-card .icon svg {
 }
 
 .cta p {
-  color: var(--accent);
+  color: var(--primary);
   font-weight: 800;
   font-size: clamp(1.05rem, 1.8vw, 1.3rem);
   text-transform: uppercase;
@@ -462,11 +467,11 @@ html[data-theme="dark"] .service-card .icon svg {
 }
 
 .cta span {
-  color: var(--muted);
+  color: var(--body-muted);
 }
 
 .footer {
-  background: #fff;
+  background: var(--page-bg);
   color: var(--body-muted);
   display: flex;
   align-items: center;
@@ -510,6 +515,24 @@ html[data-theme="dark"] .why-item {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
+html[data-theme="dark"] .stats-card {
+  background: var(--dark);
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .stats-card div {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .stats-card strong {
+  color: var(--accent);
+}
+
+html[data-theme="dark"] .stats-card span {
+  color: var(--muted);
+}
+
 html[data-theme="dark"] .why {
   background: linear-gradient(135deg, rgba(13, 13, 20, 0.96), rgba(58, 22, 143, 0.92));
 }
@@ -530,6 +553,10 @@ html[data-theme="dark"] .why-item p {
 html[data-theme="dark"] .cta {
   background: linear-gradient(135deg, rgba(108, 44, 255, 0.96), rgba(13, 13, 20, 0.96));
   color: var(--text);
+}
+
+html[data-theme="dark"] .cta p {
+  color: var(--accent);
 }
 
 html[data-theme="dark"] .cta span,

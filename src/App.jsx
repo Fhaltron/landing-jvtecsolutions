@@ -363,7 +363,7 @@ function App() {
           </div>
         </section>
 
-        <section className="cta" id="contacto" data-nav-tone="dark">
+        <section className="cta" id="contacto" data-nav-tone="theme">
           <div className="cta-inner">
             <div>
               <p>¿Necesitas una solución tecnológica?</p>

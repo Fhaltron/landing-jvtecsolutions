@@ -2,6 +2,25 @@
 
 Este documento registra los cambios realizados en la landing page. Las entradas se organizan de la más reciente a la más antigua e indican la fecha, el tipo de cambio y los archivos afectados.
 
+## 19 de julio de 2026
+
+### Ajustes del modo claro
+
+- Se igualó el fondo de la tarjeta de “Sobre nosotros” al blanco perla general de la página.
+- La tarjeta ahora se distingue mediante una línea morada tenue y una sombra más discreta, sin usar blanco brillante.
+- Se igualó el fondo de “Cotiza con JV TecSolutions” al blanco perla general, conservando únicamente sus líneas divisorias.
+- Se sustituyó el blanco brillante del modo claro por una paleta blanco perla más suave para reducir la fatiga visual.
+- La tarjeta de información de “Sobre nosotros” cambió de negro a blanco perla en modo claro.
+- Se adaptaron textos, separadores, borde y títulos de la tarjeta para mantener un contraste accesible.
+- La sección “Cotiza con JV TecSolutions” cambió de degradado morado a blanco perla en modo claro.
+- El modo oscuro conserva el fondo negro de la tarjeta y el degradado morado del bloque de contacto.
+- Se actualizó el tono de navegación del bloque de contacto para que el menú flotante cambie correctamente de contraste en ambos temas.
+
+Archivos afectados:
+
+- `styles.css`
+- `src/App.jsx`
+
 ## 18 de julio de 2026
 
 ### Navegación, contenido y redes sociales
