@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "oxlint",
     "check": "npm run lint && npm run build",
+    "security:audit": "npm audit --audit-level=low",
     "preview": "vite preview"
   },
   "dependencies": {

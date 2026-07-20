@@ -1,6 +1,6 @@
 # Informe de seguridad y optimización
 
-Última revisión: 18 de julio de 2026
+Última revisión: 20 de julio de 2026
 
 ## Resumen ejecutivo
 
@@ -9,6 +9,36 @@ Se auditó la versión actual de la landing page construida con React 19, Vite 8
 No se encontraron vulnerabilidades críticas, altas, moderadas o bajas conocidas en las dependencias instaladas. Tampoco se encontraron mecanismos de inyección como `dangerouslySetInnerHTML`, `innerHTML`, `eval`, `new Function` o `document.write`, ni credenciales dentro del código revisado.
 
 Se aplicaron medidas de defensa en profundidad, correcciones de robustez y optimizaciones de GPU/CPU. Las cabeceras HTTP nuevas entrarán en vigor cuando `vercel.json` se despliegue en Vercel.
+
+## Auditoría incremental del 20 de julio de 2026
+
+Se repitió la auditoría después de integrar el visor de galería y los últimos cambios visuales. La interfaz, las animaciones y la configuración de rendimiento no fueron modificadas durante esta revisión.
+
+Resultados:
+
+- `npm run check`: lint y compilación de producción completados sin errores ni advertencias.
+- `npm audit --audit-level=low`: **0 vulnerabilidades** en dependencias de producción y desarrollo.
+- Árbol completo revisado mediante `npm ls --all`; las dependencias opcionales ausentes corresponden a otras plataformas o herramientas no utilizadas.
+- Sin `dangerouslySetInnerHTML`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `eval`, `new Function`, `document.write`, ejecución de procesos, sockets WebSocket propios, service workers ni solicitudes de red iniciadas por la aplicación.
+- Sin secretos, contraseñas, tokens, claves API, certificados o archivos `.env` dentro del proyecto revisado.
+- Sin enlaces simbólicos inesperados.
+- Todos los enlaces con `target="_blank"` mantienen `rel="noopener noreferrer"`.
+- Los archivos JSON de npm y Vercel se analizaron correctamente.
+- El bundle no contiene mapas de código fuente ni URLs de servidores desconocidos; las URLs de documentación de React dentro del runtime son parte oficial de React.
+
+### Revisión de scripts de instalación
+
+El único paquete del lockfile marcado con script de instalación es `fsevents`, dependencia opcional exclusiva de macOS. No se instala ni ejecuta en el entorno Linux actual. Los scripts propios del proyecto se limitan a Vite, Oxlint, compilación, vista previa y auditoría npm; no ejecutan comandos de sistema ocultos.
+
+### Puertos y procesos locales
+
+- La vista previa de esta landing escucha en `127.0.0.1:5173`; está limitada a la interfaz local y no queda expuesta a la red.
+- Se observaron otros servicios del equipo en `0.0.0.0:22`, `0.0.0.0:4000`, `0.0.0.0:7070` y `*:5201`. No forman parte del código ni de los procesos de esta landing y no se modificaron.
+- Los puertos `22`, `4000`, `5201` y `7070` deben revisarse a nivel de sistema operativo y firewall si no son servicios intencionales. Esta observación no constituye una vulnerabilidad del sitio web.
+
+### Procedencia de paquetes npm
+
+`npm audit signatures` no pudo completar toda la validación porque `picocolors@1.1.1` conserva una firma del registro asociada a una clave pública expirada el 29 de enero de 2025 (`EEXPIREDSIGNATUREKEY`). Esto no equivale a una vulnerabilidad ni a evidencia de manipulación: la integridad SHA-512 del lockfile está presente y `npm audit` reporta 0 vulnerabilidades. Se conserva como limitación verificable de la auditoría de procedencia.
 
 ## Resultado por nivel de riesgo
 
@@ -30,11 +60,16 @@ Los dos pendientes bajos se describen al final del informe y no representan una 
 - **Corrección:** se añadió `vercel.json` con las siguientes cabeceras:
   - `Content-Security-Policy` estricta, sin `unsafe-inline` ni `unsafe-eval`.
   - `Cross-Origin-Opener-Policy: same-origin`.
+  - `Cross-Origin-Embedder-Policy: require-corp`.
+  - `Cross-Origin-Resource-Policy: same-origin`.
+  - `Origin-Agent-Cluster: ?1`.
   - `Permissions-Policy` para desactivar cámara, ubicación, micrófono, pagos y USB.
   - `Referrer-Policy: strict-origin-when-cross-origin`.
   - `Strict-Transport-Security` por un año e inclusión de subdominios.
   - `X-Content-Type-Options: nosniff`.
+  - `X-DNS-Prefetch-Control: off`.
   - `X-Frame-Options: DENY`.
+  - `X-Permitted-Cross-Domain-Policies: none`.
   - `X-XSS-Protection: 0`, valor recomendado para desactivar filtros heredados defectuosos.
 
 La CSP limita scripts, estilos, imágenes, fuentes y conexiones al mismo origen; bloquea objetos, formularios y marcos; restringe la URL base y actualiza solicitudes inseguras a HTTPS.
@@ -127,6 +162,7 @@ La CSP limita scripts, estilos, imágenes, fuentes y conexiones al mismo origen;
 - `README.md` describe ahora el proyecto real, los comandos, la estructura y el despliegue.
 - `vite.config.js` usa un formato consistente con el resto del código.
 - La configuración de producción se centralizó en `vercel.json`.
+- Se añadió `npm run security:audit` para repetir la revisión completa de avisos npm con nivel bajo o superior.
 - La paleta y el manejador de imágenes se declararon fuera del componente para evitar recreaciones.
 - El informe anterior, basado en la versión HTML/JavaScript previa, fue sustituido por esta auditoría de la aplicación React actual.
 
@@ -142,7 +178,7 @@ Herramientas de desarrollo revisadas:
 
 - Vite 8.1.1
 - Plugin React para Vite 6.0.3
-- Oxlint 1.71.0
+- Oxlint 1.73.0 instalado (`package.json` permite actualizaciones compatibles desde 1.71.0)
 
 Resultados anteriores del 15 de julio de 2026:
 
@@ -152,6 +188,11 @@ Resultados anteriores del 15 de julio de 2026:
 Comprobación repetida el 18 de julio de 2026:
 
 - `npm audit --omit=dev --audit-level=moderate`: **0 vulnerabilidades** en dependencias de producción.
+
+Comprobación completa del 20 de julio de 2026:
+
+- `npm audit --audit-level=low`: **0 vulnerabilidades** en producción y desarrollo.
+- `npm audit signatures`: comprobación incompleta por una clave de firma expirada del registro para `picocolors@1.1.1`; no se detectó una vulnerabilidad del paquete.
 
 Una auditoría de dependencias solo refleja avisos conocidos en el momento de ejecutarla. Debe repetirse antes de publicaciones importantes y después de actualizar paquetes.
 
@@ -182,6 +223,11 @@ El repositorio conserva `script.js`, copias `src/App.backup.*`, recursos de plan
 - `npm audit --omit=dev`: 0 vulnerabilidades.
 - `npm audit`: 0 vulnerabilidades.
 - Nueva auditoría de producción del 18 de julio: 0 vulnerabilidades.
+- Auditoría completa del 20 de julio: 0 vulnerabilidades.
+- Inspección de puertos TCP y atribución del servidor Vite a `127.0.0.1:5173`.
+- Revisión de scripts de instalación y de los scripts declarados en `package.json`.
+- Búsqueda de credenciales, claves privadas, archivos de entorno, enlaces simbólicos y APIs de ejecución o inyección.
+- Inspección del bundle final para confirmar ausencia de mapas fuente y destinos de red inesperados.
 - Búsqueda de `dangerouslySetInnerHTML`, `innerHTML`, `eval`, `new Function`, `document.write`, scripts inline y enlaces externos sin aislamiento.
 - Revisión de montaje y limpieza de eventos, observadores, WebGL y cuadros de animación.
 - Validación visual local de la portada y navegación.

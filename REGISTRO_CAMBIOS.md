@@ -6,6 +6,12 @@ Este documento registra los cambios realizados en la landing page. Las entradas 
 
 ### Galería y visor de imágenes
 
+- Se realizó una auditoría integral posterior a los cambios de galería: sintaxis, dependencias, scripts, secretos, APIs peligrosas, bundle y puertos locales.
+- La auditoría npm completa reportó 0 vulnerabilidades de producción y desarrollo.
+- Se confirmó que Vite escucha únicamente en `127.0.0.1:5173` y no expone la vista previa a otras máquinas.
+- Se reforzaron las cabeceras de producción con COEP, aislamiento de agente, bloqueo de prefetch DNS y políticas cross-domain.
+- Se agregó el comando `npm run security:audit` para futuras revisiones de dependencias.
+- Se actualizó `INFORME_SEGURIDAD_OPTIMIZACION.md` con los resultados, limitaciones y puertos observados.
 - Se centró automáticamente la miniatura cuando la galería contiene una sola imagen.
 - La cuadrícula quedó preparada para distribuir y centrar futuras imágenes en varias filas.
 - Se integró la imagen real desde `assets/servicios-computo.jpeg` mediante el sistema de recursos de Vite.
@@ -20,6 +26,9 @@ Este documento registra los cambios realizados en la landing page. Las entradas 
 
 Archivos afectados:
 
+- `package.json`
+- `vercel.json`
+- `INFORME_SEGURIDAD_OPTIMIZACION.md`
 - `src/App.jsx`
 - `src/App.css`
 - `assets/servicios-computo.jpeg`
