@@ -2,6 +2,28 @@
 
 Este documento registra los cambios realizados en la landing page. Las entradas se organizan de la más reciente a la más antigua e indican la fecha, el tipo de cambio y los archivos afectados.
 
+## 20 de julio de 2026
+
+### Galería y visor de imágenes
+
+- Se centró automáticamente la miniatura cuando la galería contiene una sola imagen.
+- La cuadrícula quedó preparada para distribuir y centrar futuras imágenes en varias filas.
+- Se integró la imagen real desde `assets/servicios-computo.jpeg` mediante el sistema de recursos de Vite.
+- Se actualizaron la miniatura y el visor para utilizar correctamente el formato `.jpeg`.
+- Se preparó una miniatura interactiva para el anuncio de reparación de equipo de cómputo.
+- La miniatura utiliza la misma elevación, escala y brillo de las tarjetas al pasar el cursor.
+- Al seleccionar la miniatura se abre un visor de pantalla completa sin perder la posición de la página.
+- El visor puede cerrarse con el botón, haciendo clic fuera de la imagen o presionando `Escape`.
+- Al cerrar el visor se restaura el foco en la miniatura y se reactiva el desplazamiento de la página.
+- Se agregaron etiquetas accesibles, foco visible y compatibilidad con movimiento reducido.
+- La imagen se almacena como `assets/servicios-computo.jpeg` y Vite genera automáticamente su ruta optimizada de producción.
+
+Archivos afectados:
+
+- `src/App.jsx`
+- `src/App.css`
+- `assets/servicios-computo.jpeg`
+
 ## 19 de julio de 2026
 
 ### Ajustes del modo claro

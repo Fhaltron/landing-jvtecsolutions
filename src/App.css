@@ -171,13 +171,125 @@
   border-radius: 13px;
 }
 
+.gallery-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  border-radius: 22px;
+  background: transparent;
+  box-shadow: 0 12px 35px rgba(20, 20, 40, 0.12);
+  cursor: zoom-in;
+}
+
+.gallery-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 280px));
+  justify-content: center;
+}
+
+.gallery-item[hidden] {
+  display: none;
+}
+
+.gallery-item img {
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.gallery-zoom-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(13, 13, 20, 0.78);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  backdrop-filter: blur(6px);
+}
+
+.gallery-item:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 52px);
+  background: rgba(5, 4, 12, 0.92);
+  backdrop-filter: blur(8px);
+  animation: lightbox-fade-in 0.2s ease-out;
+}
+
+.lightbox img {
+  display: block;
+  max-width: min(96vw, 1500px);
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.52);
+  animation: lightbox-image-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lightbox-close {
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 50%;
+  background: rgba(13, 13, 20, 0.8);
+  color: #fff;
+  font: inherit;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  background: var(--primary);
+}
+
+.lightbox-close:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@keyframes lightbox-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes lightbox-image-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
 /* Efecto de magnificación inspirado en un dock para tarjetas y controles. */
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .hero-card,
   .stats-card,
   .service-card,
   .why-item,
-  .gallery-grid img {
+  .gallery-grid img,
+  .gallery-item {
     position: relative;
     transform: translateY(0) scale(1);
     transition:
@@ -190,7 +302,8 @@
   .stats-card:hover,
   .service-card:hover,
   .why-item:hover,
-  .gallery-grid img:hover {
+  .gallery-grid img:hover,
+  .gallery-item:hover {
     z-index: 2;
     transform: translateY(-8px) scale(1.025);
     border-color: rgba(108, 44, 255, 0.45);
@@ -241,12 +354,18 @@
   .service-card:hover,
   .why-item:hover,
   .gallery-grid img:hover,
+  .gallery-item:hover,
   .service-card:hover .icon,
   .stats-card:hover strong,
   .btn:hover,
   .theme-toggle:hover,
   .social-links a:hover {
     transform: none;
+  }
+
+  .lightbox,
+  .lightbox img {
+    animation: none;
   }
 }
 

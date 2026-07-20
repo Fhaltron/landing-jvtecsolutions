@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Lightfall from "./Lightfall";
 import logo from "../assets/logo.png";
 import portada from "../assets/portada.png";
+import servicioComputo from "../assets/servicios-computo.jpeg";
 import "./App.css";
 
 const LIGHTFALL_COLORS = Object.freeze(["#A6C8FF", "#5227FF", "#FF9FFC"]);
@@ -19,7 +20,10 @@ function App() {
     }
   });
   const [useDarkNavText, setUseDarkNavText] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const navbarRef = useRef(null);
+  const galleryTriggerRef = useRef(null);
+  const lightboxCloseRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = isDark ? "dark" : "light";
@@ -30,6 +34,29 @@ function App() {
       // El cambio visual funciona aunque el navegador bloquee el almacenamiento.
     }
   }, [isDark]);
+
+  useEffect(() => {
+    if (!selectedImage) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const galleryTrigger = galleryTriggerRef.current;
+    document.body.style.overflow = "hidden";
+    lightboxCloseRef.current?.focus();
+
+    const closeOnEscape = event => {
+      if (event.key === "Escape") {
+        setSelectedImage(null);
+      }
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+      galleryTrigger?.focus({ preventScroll: true });
+    };
+  }, [selectedImage]);
 
   useEffect(() => {
     let contrastTimer;
@@ -329,13 +356,29 @@ function App() {
           </div>
 
           <div className="gallery-grid">
-            <img
-              src="/assets/servicios-computo.jpg"
-              alt="Servicio de reparación de computadoras"
-              loading="lazy"
-              decoding="async"
-              onError={hideUnavailableImage}
-            />
+            <button
+              ref={galleryTriggerRef}
+              className="gallery-item"
+              type="button"
+              aria-label="Ampliar imagen del servicio de reparación de computadoras"
+              onClick={() =>
+                setSelectedImage({
+                  src: servicioComputo,
+                  alt: "Anuncio del servicio de diagnóstico y reparación de equipo de cómputo",
+                })
+              }
+            >
+              <img
+                src={servicioComputo}
+                alt="Servicio de reparación de computadoras"
+                loading="lazy"
+                decoding="async"
+                onError={event => {
+                  event.currentTarget.closest(".gallery-item").hidden = true;
+                }}
+              />
+              <span className="gallery-zoom-hint" aria-hidden="true">Ver imagen completa</span>
+            </button>
 
             <img
               src="/assets/servicios-web.jpg"
@@ -460,6 +503,31 @@ function App() {
           decoding="async"
         />
       </footer>
+
+      {selectedImage && (
+        <div
+          className="lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista completa de la imagen"
+          onMouseDown={event => {
+            if (event.target === event.currentTarget) {
+              setSelectedImage(null);
+            }
+          }}
+        >
+          <button
+            ref={lightboxCloseRef}
+            className="lightbox-close"
+            type="button"
+            aria-label="Cerrar imagen completa"
+            onClick={() => setSelectedImage(null)}
+          >
+            ×
+          </button>
+          <img src={selectedImage.src} alt={selectedImage.alt} />
+        </div>
+      )}
     </>
   );
 }
